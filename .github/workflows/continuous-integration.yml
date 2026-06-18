@@ -40,14 +40,16 @@ jobs:
       # 2. Download nightly AliceVision binaries via GitHub CLI
       - name: Fetch AliceVision Nightly Binaries (Linux)
         if: matrix.os == 'ubuntu-latest'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ${{ github.workspace }}/alicevision_bin
           cd ${{ github.workspace }}/alicevision_bin
           
-          # Downloads only the Linux archive from the nightly tag
-          gh release download nightly --repo alicevision/AliceVision --pattern "*Linux*"
+          # Fetch the public release JSON for the 'nightly' tag and extract the download URL matching *linux.tar.gz
+          ASSET_URL=$(curl -s https://api.github.com/repos/alicevision/AliceVision/releases/tags/nightly \
+            | jq -r '.assets[] | select(.name | ascii_downcase | endswith("linux.tar.gz")) | .browser_download_url')
+          
+          echo "Downloading Linux Nightly from: $ASSET_URL"
+          curl -L -O "$ASSET_URL"
           
           # Extract the archive (handles dynamic names by expanding the wildcard)
           tar -xzf *.tar.gz --strip-components=1
@@ -56,15 +58,17 @@ jobs:
       - name: Fetch AliceVision Nightly Binaries (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p ${{ github.workspace }}/alicevision_bin
           cd ${{ github.workspace }}/alicevision_bin
           
-          # Downloads only the Windows archive from the nightly tag
-          gh release download nightly --repo alicevision/AliceVision --pattern "*Windows*"
+          # Fetch the public release JSON for the 'nightly' tag and extract the download URL matching *windows.zip
+          ASSET_URL=$(curl -s https://api.github.com/repos/alicevision/AliceVision/releases/tags/nightly \
+            | jq -r '.assets[] | select(.name | ascii_downcase | endswith("windows.zip")) | .browser_download_url')
           
+          echo "Downloading Windows Nightly from: $ASSET_URL"
+          curl -L -O "$ASSET_URL"
+
           # Unzip using wildcard mapping
           unzip "*.zip"
           
