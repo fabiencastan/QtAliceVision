@@ -1,0 +1,87 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "main", "develop", "master" ]
+  pull_request:
+    branches: [ "main", "develop", "master" ]
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # 1. Install Qt environment
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.1'
+          host: ${{ matrix.platform }}
+          target: 'desktop'
+          setup-python: 'true'
+          use-official: false
+          email: ${{ secrets.QT_EMAIL }}
+          pw: ${{ secrets.QT_PW }}
+
+      # 2. Download nightly AliceVision binaries via GitHub CLI
+      - name: Fetch AliceVision Nightly Binaries (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ${{ github.workspace }}/alicevision_bin
+          cd ${{ github.workspace }}/alicevision_bin
+          
+          # Downloads only the Linux archive from the nightly tag
+          gh release download nightly --repo alicevision/AliceVision --pattern "*Linux*"
+          
+          # Extract the archive (handles dynamic names by expanding the wildcard)
+          tar -xzf *.tar.gz --strip-components=1
+          echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake" >> $GITHUB_ENV
+
+      - name: Fetch AliceVision Nightly Binaries (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ${{ github.workspace }}/alicevision_bin
+          cd ${{ github.workspace }}/alicevision_bin
+          
+          # Downloads only the Windows archive from the nightly tag
+          gh release download nightly --repo alicevision/AliceVision --pattern "*Windows*"
+          
+          # Unzip using wildcard mapping
+          unzip "*.zip"
+          
+          # Check if extracted directly or inside an outer nested directory
+          INNER_DIR=$(find . -maxdepth 1 -type d -name "AliceVision*" | head -n 1)
+          if [ -n "$INNER_DIR" ]; then
+            echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/${INNER_DIR}/share/aliceVision/cmake" >> $GITHUB_ENV
+          else
+            echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake" >> $GITHUB_ENV
+          fi
+
+      # 3. Configure and Build qtAliceVision
+      - name: Configure CMake
+        run: |
+          cmake -B build -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DAliceVision_DIR="${{ env.AliceVision_DIR }}"
+
+      - name: Build Project
+        run: cmake --build build --config Release
