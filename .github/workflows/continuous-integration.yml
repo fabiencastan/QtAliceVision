@@ -78,6 +78,9 @@ jobs:
           echo "Show file: ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake"
           cat ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake
 
+          ls -l ${{ github.workspace }}/alicevision_bin/lib64/cmake/Ceres
+          cat ${{ github.workspace }}/alicevision_bin/lib64/cmake/Ceres/*
+
       - name: Fetch AliceVision Nightly Binaries (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
