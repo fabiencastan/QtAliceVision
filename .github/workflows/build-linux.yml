@@ -15,8 +15,37 @@ jobs:
       buildDir: '${{ github.workspace }}/build/'
       QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
+      QT_DIR: /opt/qt_install
     steps:
       - uses: actions/checkout@v1
+
+      # 1. Install Qt environment
+      - name: Setup Qt
+        # uses: jurplel/install-qt-action@v4
+        # with:
+        #   version: '6.11.1'
+        #   host: ${{ matrix.platform }}
+        #   target: 'desktop'
+        #   setup-python: false
+        #   install-deps: 'nosudo'
+        #   modules: 'qtcharts qtshadertools qttasktree'
+        #   use-official: matrix.os == 'windows-latest'
+        #   email: ${{ secrets.QT_EMAIL }}
+        #   pw: ${{ secrets.QT_PW }}
+        run: |
+            # Define target directory and version
+            QT_VERSION=6.11.1
+            mkdir -p ${QT_DIR}
+
+            # Ensure Python3 and pip are available, then install aqtinstall
+            pip3 install --upgrade aqtinstall
+
+            # Download and extract Qt binaries directly to your target directory
+            # Syntax: aqt install-qt <host> <target> <version> [architecture] -o <output_dir>
+            echo "Installing Qt ${QT_VERSION} to ${QT_DIR}..."
+            aqt install-qt linux desktop ${QT_VERSION} gcc_64 -o ${QT_DIR}
+
+            # Note: aqt creates a sub-folder structure like ${QT_DIR}/6.11.1/gcc_64/
 
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -48,43 +77,13 @@ jobs:
 
           rm *.tar.gz
 
-      # 1. Install Qt environment
-      - name: Setup Qt
-        # uses: jurplel/install-qt-action@v4
-        # with:
-        #   version: '6.11.1'
-        #   host: ${{ matrix.platform }}
-        #   target: 'desktop'
-        #   setup-python: false
-        #   install-deps: 'nosudo'
-        #   modules: 'qtcharts qtshadertools qttasktree'
-        #   use-official: matrix.os == 'windows-latest'
-        #   email: ${{ secrets.QT_EMAIL }}
-        #   pw: ${{ secrets.QT_PW }}
-        run: |
-          # Download and extract Qt binaries for Linux
-          QT_VERSION=6.11.1
-          QT_DIR=${QTALICEVISION_ROOT}
-          mkdir -p ${QT_DIR}
-          cd ${QT_DIR}
-          
-          # Construct the download URL for the Qt installer
-          QT_INSTALLER_URL="https://download.qt.io/official_releases/qt/${QT_VERSION}/qt-opensource-linux-x64-${QT_VERSION}.run"
-          
-          echo "Downloading Qt from: $QT_INSTALLER_URL"
-          curl -L -o qt-installer.run "$QT_INSTALLER_URL"
-          
-          # Make the installer executable and run it in non-interactive mode
-          chmod +x qt-installer.run
-          ./qt-installer.run --platform minimal --script <(echo "setTargetDir ${QT_DIR}; installPackage qt.qt6.${QT_VERSION}.gcc_64;") --verbose
-
       - name: Configure CMake
         working-directory: ./build
         run: |
           cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS:BOOL=ON \
-            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${DEPS_INSTALL_DIR}" \
+            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${DEPS_INSTALL_DIR}:${QT_DIR}" \
             -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
             -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
 
