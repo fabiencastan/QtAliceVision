@@ -97,7 +97,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build -S .. \
+          cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${DEPS_INSTALL_DIR}:${QT_DIR}" \
