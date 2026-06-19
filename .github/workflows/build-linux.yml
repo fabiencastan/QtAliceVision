@@ -42,15 +42,13 @@ jobs:
             QT_VERSION=6.11.1
             mkdir -p ${QT_DIR}
 
-            # Ensure Python3 and pip are available, then install aqtinstall
-            pip install --upgrade aqtinstall
-
-            # Download and extract Qt binaries directly to your target directory
-            # Syntax: aqt install-qt <host> <target> <version> [architecture] -o <output_dir>
-            echo "Installing Qt ${QT_VERSION} to ${QT_DIR}..."
-            aqt install-qt linux desktop ${QT_VERSION} gcc_64 -o ${QT_DIR}
-
-            # Note: aqt creates a sub-folder structure like ${QT_DIR}/6.11.1/gcc_64/
+            wget --no-check-certificate "https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run" -O "qt.run"
+            chmod +x qt.run
+            ./qt.run --root /opt/Qt --verbose --email ${QT_CI_LOGIN} --password ${QT_CI_P} --accept-obligations \
+                --accept-licenses --default-answer --platform minimal --auto-answer installationErrorWithCancel=Ignore \
+                --no-force-installations --no-default-installations --confirm-command \
+                install qt.qt6.6111.linux_gcc_64 qt.qt6.6111.addons.qtcharts qt.qt6.6111.addons.
+            rm qt.run
 
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
