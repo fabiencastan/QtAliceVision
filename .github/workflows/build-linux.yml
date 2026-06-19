@@ -48,6 +48,19 @@ jobs:
 
           rm *.tar.gz
 
+      # 1. Install Qt environment
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.1'
+          host: ${{ matrix.platform }}
+          target: 'desktop'
+          setup-python: false
+          modules: 'qtcharts qtshadertools qttasktree'
+          use-official: matrix.os == 'windows-latest'
+          email: ${{ secrets.QT_EMAIL }}
+          pw: ${{ secrets.QT_PW }}
+
       - name: Configure CMake
         working-directory: ./build
         run: |
