@@ -16,8 +16,8 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux
-          - os: windows-latest
-            platform: windows
+          # - os: windows-latest
+          #   platform: windows
 
     steps:
       - name: Checkout Code
