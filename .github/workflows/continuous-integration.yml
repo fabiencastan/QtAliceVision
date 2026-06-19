@@ -38,7 +38,7 @@ jobs:
           host: ${{ matrix.platform }}
           target: 'desktop'
           setup-python: 'true'
-          modules: 'qtcharts'
+          modules: 'qtcharts ShaderTools'
           use-official: false
           email: ${{ secrets.QT_EMAIL }}
           pw: ${{ secrets.QT_PW }}
