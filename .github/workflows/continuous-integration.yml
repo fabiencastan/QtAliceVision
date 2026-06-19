@@ -63,7 +63,7 @@ jobs:
           echo ALICEVISION_ROOT=${{ github.workspace }}/alicevision_bin >> $GITHUB_ENV
           export ALICEVISION_ROOT=${{ github.workspace }}/alicevision_bin
 
-          ls -l ${{ github.workspace }}/alicevision_bin
+          ls -l ${{ github.workspace }}/alicevision_bin/*
 
           echo "Files A"
           find ${{ github.workspace }}/alicevision_bin -name "*.cmake"
@@ -80,6 +80,7 @@ jobs:
 
           ls -l ${{ github.workspace }}/alicevision_bin/lib64/cmake/Ceres
           cat ${{ github.workspace }}/alicevision_bin/lib64/cmake/Ceres/*
+          find ${{ github.workspace }}/alicevision_bin
 
       - name: Fetch AliceVision Nightly Binaries (Windows)
         if: matrix.os == 'windows-latest'
