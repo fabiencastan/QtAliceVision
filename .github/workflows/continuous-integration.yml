@@ -65,6 +65,10 @@ jobs:
 
           ls -l ${{ github.workspace }}/alicevision_bin
 
+          echo "Files A"
+          find ${{ github.workspace }}/alicevision_bin -name "*.cmake"
+          echo "Files B"
+          find ${{ github.workspace }}/alicevision_bin -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la"
           echo "Files to be modified:"
           find ${{ github.workspace }}/alicevision_bin -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" -exec echo "{}" \;
           echo "Process files:"
