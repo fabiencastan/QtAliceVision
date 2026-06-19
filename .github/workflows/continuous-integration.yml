@@ -78,8 +78,6 @@ jobs:
           echo "Show file: ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake"
           cat ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake
 
-          ls -l ${{ github.workspace }}/alicevision_bin/lib64/cmake/Ceres
-          cat ${{ github.workspace }}/alicevision_bin/lib64/cmake/Ceres/*
           find ${{ github.workspace }}/alicevision_bin
 
       - name: Fetch AliceVision Nightly Binaries (Windows)
