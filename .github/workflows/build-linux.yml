@@ -38,6 +38,11 @@ jobs:
         #   email: ${{ secrets.QT_EMAIL }}
         #   pw: ${{ secrets.QT_PW }}
         run: |
+            dnf update -y
+            dnf install -y flex fontconfig freetype glib2-devel libICE
+            dnf install -y libX11 libXext libXi libXrender libSM
+            dnf install -y libXt-devel mesa-libGLU-devel mesa-libOSMesa-devel mesa-libGL-devel mesa-libEGL-devel
+            dnf install -y zlib-devel systemd openssh-server
             dnf install -y libxcb-devel \
                             libxkbcommon-devel \
                             libxkbcommon-x11-devel \
