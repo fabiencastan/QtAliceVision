@@ -25,6 +25,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup Python 3.11  
+        uses: actions/setup-python@v6  
+        with:  
+          python-version: '3.11'
+
       # 1. Install Qt environment
       - name: Setup Qt
         uses: jurplel/install-qt-action@v4
@@ -34,7 +39,7 @@ jobs:
           target: 'desktop'
           setup-python: 'true'
           modules: 'qtcharts'
-          use-official: true
+          use-official: false
           email: ${{ secrets.QT_EMAIL }}
           pw: ${{ secrets.QT_PW }}
 
