@@ -15,7 +15,7 @@ jobs:
       buildDir: '${{ github.workspace }}/build/'
       QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
-      QT_DIR: /opt/qt_install
+      QT_DIR: /opt/Qt
     steps:
       - uses: actions/checkout@v1
 
@@ -40,7 +40,7 @@ jobs:
         run: |
             dnf install -y flex fontconfig freetype glib2-devel libICE
             dnf install -y libX11 libXext libXi libXrender libSM
-            dnf install -y libXt-devel mesa-libGLU-devel mesa-libOSMesa-devel mesa-libGL-devel mesa-libEGL-devel
+            dnf install -y libXt-devel mesa-libGLU-devel mesa-libGL-devel mesa-libEGL-devel
             dnf install -y zlib-devel systemd openssh-server
             dnf install -y libxcb-devel \
                             libxkbcommon-devel \
