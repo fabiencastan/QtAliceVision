@@ -60,6 +60,9 @@ jobs:
           # Extract the archive (handles dynamic names by expanding the wildcard)
           tar -xzf *.tar.gz --strip-components=1
           echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake" >> $GITHUB_ENV
+          echo ALICEVISION_ROOT = ${{ github.workspace }}/alicevision_bin >> $GITHUB_ENV
+
+          find . -name “*.cmake” -o -name “*.pc” -o -name “*config” -o -name “*.la” -exec sed -i “s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g” {} \;
 
       - name: Fetch AliceVision Nightly Binaries (Windows)
         if: matrix.os == 'windows-latest'
