@@ -64,6 +64,8 @@ jobs:
 
           find . -name “*.cmake” -o -name “*.pc” -o -name “*config” -o -name “*.la” -exec sed -i “s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g” {} \;
 
+          cat ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake
+
       - name: Fetch AliceVision Nightly Binaries (Windows)
         if: matrix.os == 'windows-latest'
         shell: bash
@@ -94,6 +96,8 @@ jobs:
         run: |
           cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS:BOOL=ON \
+            -DCMAKE_PREFIX_PATH:PATH="${{ env.AliceVision_DIR }}" \
             -DAliceVision_DIR="${{ env.AliceVision_DIR }}"
 
       - name: Build Project
