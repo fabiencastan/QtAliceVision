@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
       # 1. Install Qt environment
       - name: Setup Qt
         # uses: jurplel/install-qt-action@v4
@@ -38,7 +43,7 @@ jobs:
             mkdir -p ${QT_DIR}
 
             # Ensure Python3 and pip are available, then install aqtinstall
-            pip3 install --upgrade aqtinstall
+            pip install --upgrade aqtinstall
 
             # Download and extract Qt binaries directly to your target directory
             # Syntax: aqt install-qt <host> <target> <version> [architecture] -o <output_dir>
