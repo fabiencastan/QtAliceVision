@@ -61,7 +61,7 @@ jobs:
             ./qt.run --root /opt/Qt --verbose --email ${{ secrets.QT_EMAIL }} --password ${{ secrets.QT_PW }} --accept-obligations \
                 --accept-licenses --default-answer --platform minimal --auto-answer installationErrorWithCancel=Ignore \
                 --no-force-installations --no-default-installations --confirm-command \
-                install qt.qt6.6111.linux_gcc_64 qt.qt6.6111.addons.qtcharts qt.qt6.6111.addons.
+                install qt.qt6.6111.linux_gcc_64 qt.qt6.6111.addons.qtcharts qt.qt6.6111.addons.qt3d
             echo "qt.run done"
             rm qt.run
 
