@@ -33,6 +33,7 @@ jobs:
           host: ${{ matrix.platform }}
           target: 'desktop'
           setup-python: 'true'
+          modules: 'qtcharts'
           use-official: true
           email: ${{ secrets.QT_EMAIL }}
           pw: ${{ secrets.QT_PW }}
