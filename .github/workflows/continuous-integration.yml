@@ -63,8 +63,13 @@ jobs:
           echo ALICEVISION_ROOT=${{ github.workspace }}/alicevision_bin >> $GITHUB_ENV
           export ALICEVISION_ROOT=${{ github.workspace }}/alicevision_bin
 
-          find . -name “*.cmake” -o -name “*.pc” -o -name “*config” -o -name “*.la” -exec sed -i “s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g” {} \;
+          echo "Files to be modified:"
+          find . -name “*.cmake” -o -name “*.pc” -o -name “*config” -o -name “*.la” -exec echo "{}" \;
+          echo "Process files:"
+          find . -name “*.cmake” -o -name “*.pc” -o -name “*config” -o -name “*.la” -exec sed -i “s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g” "{}" \;
+          echo "Process files completed."
 
+          echo "Show file: ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake"
           cat ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake
 
       - name: Fetch AliceVision Nightly Binaries (Windows)
