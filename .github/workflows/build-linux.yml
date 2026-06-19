@@ -38,6 +38,13 @@ jobs:
         #   email: ${{ secrets.QT_EMAIL }}
         #   pw: ${{ secrets.QT_PW }}
         run: |
+            dnf install -y libxcb-devel \
+                            libxkbcommon-devel \
+                            libxkbcommon-x11-devel \
+                            xcb-util-wm xcb-util-image \
+                            xcb-util-keysyms \
+                            xcb-util-renderutil
+
             # Define target directory and version
             QT_VERSION=6.11.1
             mkdir -p ${QT_DIR}
