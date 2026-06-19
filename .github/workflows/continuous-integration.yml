@@ -68,11 +68,11 @@ jobs:
           echo "Files A"
           find ${{ github.workspace }}/alicevision_bin -name "*.cmake"
           echo "Files B"
-          find ${{ github.workspace }}/alicevision_bin -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la"
+          find ${{ github.workspace }}/alicevision_bin \( -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" \)
           echo "Files to be modified:"
-          find ${{ github.workspace }}/alicevision_bin -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" -exec echo "{}" \;
+          find ${{ github.workspace }}/alicevision_bin \( -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" \) -exec echo "{}" \;
           echo "Process files:"
-          find ${{ github.workspace }}/alicevision_bin -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" -exec sed -i "s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g" "{}" \;
+          find ${{ github.workspace }}/alicevision_bin \( -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" \) -exec sed -i "s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g" "{}" \;
           echo "Process files completed."
 
           echo "Show file: ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake"
