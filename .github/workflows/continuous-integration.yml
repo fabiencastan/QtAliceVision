@@ -2,117 +2,23 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ "main", "develop", "master" ]
+    branches:
+      - master
+      - develop
+    # Skip jobs when only documentation files are changed
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - '**.db'
+      - 'docs/**'
   pull_request:
-    branches: [ "main", "develop", "master" ]
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - '**.db'
+      - 'docs/**'
 
 jobs:
-  build:
-    name: Build (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-          # - os: windows-latest
-          #   platform: windows
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Setup Python 3.11  
-        uses: actions/setup-python@v6  
-        with:  
-          python-version: '3.11'
-
-      # 1. Install Qt environment
-      - name: Setup Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.11.1'
-          host: ${{ matrix.platform }}
-          target: 'desktop'
-          setup-python: false
-          modules: 'qtcharts qtshadertools qttasktree'
-          use-official: matrix.os == 'windows-latest'
-          email: ${{ secrets.QT_EMAIL }}
-          pw: ${{ secrets.QT_PW }}
-
-      # 2. Download nightly AliceVision binaries via GitHub CLI
-      - name: Fetch AliceVision Nightly Binaries (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          mkdir -p ${{ github.workspace }}/alicevision_bin
-          cd ${{ github.workspace }}/alicevision_bin
-          
-          # Fetch the public release JSON for the 'nightly' tag and extract the download URL matching *linux.tar.gz
-          ASSET_URL=$(curl -s https://api.github.com/repos/alicevision/AliceVision/releases/tags/nightly \
-            | jq -r '.assets[] | select(.name | ascii_downcase | endswith("linux.tar.gz")) | .browser_download_url')
-          
-          echo "Downloading Linux Nightly from: $ASSET_URL"
-          curl -L -O "$ASSET_URL"
-          
-          # Extract the archive (handles dynamic names by expanding the wildcard)
-          tar -xzf *.tar.gz --strip-components=1
-          echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake" >> $GITHUB_ENV
-          echo ALICEVISION_ROOT=${{ github.workspace }}/alicevision_bin >> $GITHUB_ENV
-          export ALICEVISION_ROOT=${{ github.workspace }}/alicevision_bin
-
-          ls -l ${{ github.workspace }}/alicevision_bin/*
-
-          echo "Files A"
-          find ${{ github.workspace }}/alicevision_bin -name "*.cmake"
-          echo "Files B"
-          find ${{ github.workspace }}/alicevision_bin \( -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" \)
-          echo "Files to be modified:"
-          find ${{ github.workspace }}/alicevision_bin \( -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" \) -exec echo "{}" \;
-          echo "Process files:"
-          find ${{ github.workspace }}/alicevision_bin \( -name "*.cmake" -o -name "*.pc" -o -name "*config" -o -name "*.la" \) -exec sed -i "s=/opt/AliceVision_install=${ALICEVISION_ROOT}=g" "{}" \;
-          echo "Process files completed."
-
-          echo "Show file: ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake"
-          cat ${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake/AliceVisionConfig.cmake
-
-          find ${{ github.workspace }}/alicevision_bin
-
-      - name: Fetch AliceVision Nightly Binaries (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: bash
-        run: |
-          mkdir -p ${{ github.workspace }}/alicevision_bin
-          cd ${{ github.workspace }}/alicevision_bin
-          
-          # Fetch the public release JSON for the 'nightly' tag and extract the download URL matching *windows.zip
-          ASSET_URL=$(curl -s https://api.github.com/repos/alicevision/AliceVision/releases/tags/nightly \
-            | jq -r '.assets[] | select(.name | ascii_downcase | endswith("windows.zip")) | .browser_download_url')
-          
-          echo "Downloading Windows Nightly from: $ASSET_URL"
-          curl -L -O "$ASSET_URL"
-
-          # Unzip using wildcard mapping
-          unzip "*.zip"
-          
-          # Check if extracted directly or inside an outer nested directory
-          INNER_DIR=$(find . -maxdepth 1 -type d -name "AliceVision*" | head -n 1)
-          if [ -n "$INNER_DIR" ]; then
-            echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/${INNER_DIR}/share/aliceVision/cmake" >> $GITHUB_ENV
-          else
-            echo "AliceVision_DIR=${{ github.workspace }}/alicevision_bin/share/aliceVision/cmake" >> $GITHUB_ENV
-          fi
-
-      # 3. Configure and Build qtAliceVision
-      - name: Configure CMake
-        run: |
-          cmake -B build -S . \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_SHARED_LIBS:BOOL=ON \
-            -DCMAKE_PREFIX_PATH:PATH="${{ env.AliceVision_DIR }}" \
-            -DAliceVision_DIR="${{ env.AliceVision_DIR }}"
-
-      - name: Build Project
-        run: cmake --build build --config Release
+  build-linux:
+    uses: ./.github/workflows/build-linux.yml
+    secrets: inherit

@@ -1,0 +1,91 @@
+name: Build Linux
+
+on:
+  workflow_call:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    container:
+      image: "alicevision/alicevision-deps:2026.03.30-rocky9-cuda12.1.1"
+    env:
+      DEPS_INSTALL_DIR: /opt/AliceVision_install
+      BUILD_TYPE: Release
+      CTEST_OUTPUT_ON_FAILURE: 1
+      buildDir: '${{ github.workspace }}/build/'
+      QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
+      ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          # Isolate writes per ref (branch/PR) to reduce cross-PR cache contamination.
+          key: ccache-${{ runner.os }}-rocky9-cuda12.1.1-${{ github.ref_name }}-${{ hashFiles('CMakeLists.txt', '.github/workflows/build-linux.yml') }}
+          restore-keys: |
+            ccache-${{ runner.os }}-rocky9-cuda12.1.1-${{ github.ref_name }}-
+            ccache-${{ runner.os }}-rocky9-cuda12.1.1-develop-
+            ccache-${{ runner.os }}-
+          max-size: "1000M"
+
+      # 2. Download nightly AliceVision binaries via GitHub CLI
+      - name: Fetch AliceVision Nightly Binaries (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p ${ALICEVISION_BUNDLE}
+          cd ${ALICEVISION_BUNDLE}
+          
+          # Fetch the public release JSON for the 'nightly' tag and extract the download URL matching *linux.tar.gz
+          ASSET_URL=$(curl -s https://api.github.com/repos/alicevision/AliceVision/releases/tags/nightly \
+            | jq -r '.assets[] | select(.name | ascii_downcase | endswith("linux.tar.gz")) | .browser_download_url')
+          
+          echo "Downloading Linux Nightly from: $ASSET_URL"
+          curl -L -O "$ASSET_URL"
+          
+          # Extract the archive (handles dynamic names by expanding the wildcard)
+          tar -xzf *.tar.gz --strip-components=1
+
+          rm *.tar.gz
+
+      - name: Configure CMake
+        working-directory: ./build
+        run: |
+          cmake -B build -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS:BOOL=ON \
+            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${DEPS_INSTALL_DIR}" \
+            -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
+            -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
+
+      - name: Build
+        working-directory: ./build
+        run: |
+          cmake --build . -j$(nproc) --config Release
+
+      - name: Install
+        working-directory: ./build
+        run: |
+          cmake --install .
+
+      # ── Archive & Upload for nightly release ────────
+
+      # Only runs when called from nightly.yml; skipped on regular CI.
+      - name: Create archive
+        if: github.workflow == 'Nightly'
+        id: archive
+        run: |
+          git config --global --add safe.directory ${GITHUB_WORKSPACE}
+          COMMIT_SHORT=$(git rev-parse --short=8 HEAD)
+          DATE=$(date -u +%Y%m%d)
+          ARCHIVE="qtAliceVision-nightly-${DATE}-${COMMIT_SHORT}-linux.tar.gz"
+          tar -czf "${ARCHIVE}" -C "$(dirname ${QTALICEVISION_ROOT})" "$(basename ${QTALICEVISION_ROOT})"
+          echo "filename=${ARCHIVE}" >> $GITHUB_OUTPUT
+
+      - name: Upload archive artifact
+        if: github.workflow == 'Nightly'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-package
+          path: ${{ steps.archive.outputs.filename }}
+          retention-days: 3
