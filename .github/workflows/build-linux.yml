@@ -56,6 +56,7 @@ jobs:
           host: ${{ matrix.platform }}
           target: 'desktop'
           setup-python: false
+          install-deps: 'nosudo'
           modules: 'qtcharts qtshadertools qttasktree'
           use-official: matrix.os == 'windows-latest'
           email: ${{ secrets.QT_EMAIL }}
