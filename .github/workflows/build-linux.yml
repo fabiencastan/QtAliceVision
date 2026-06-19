@@ -38,7 +38,6 @@ jobs:
         #   email: ${{ secrets.QT_EMAIL }}
         #   pw: ${{ secrets.QT_PW }}
         run: |
-            dnf update -y --skip-broken
             dnf install -y flex fontconfig freetype glib2-devel libICE
             dnf install -y libX11 libXext libXi libXrender libSM
             dnf install -y libXt-devel mesa-libGLU-devel mesa-libOSMesa-devel mesa-libGL-devel mesa-libEGL-devel
