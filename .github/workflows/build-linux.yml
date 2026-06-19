@@ -58,7 +58,7 @@ jobs:
             echo "qt.run downloaded"
             chmod +x qt.run
             echo "launch qt.run:"
-            ./qt.run --root /opt/Qt --verbose --email ${QT_CI_LOGIN} --password ${QT_CI_P} --accept-obligations \
+            ./qt.run --root /opt/Qt --verbose --email ${{ secrets.QT_EMAIL }} --password ${{ secrets.QT_PW }} --accept-obligations \
                 --accept-licenses --default-answer --platform minimal --auto-answer installationErrorWithCancel=Ignore \
                 --no-force-installations --no-default-installations --confirm-command \
                 install qt.qt6.6111.linux_gcc_64 qt.qt6.6111.addons.qtcharts qt.qt6.6111.addons.
