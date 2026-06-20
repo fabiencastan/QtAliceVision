@@ -9,6 +9,8 @@ jobs:
     container:
       image: "alicevision/alicevision-deps:2026.03.30-rocky9-cuda12.1.1"
     env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
       BUILD_TYPE: Release
       CTEST_OUTPUT_ON_FAILURE: 1
       buildDir: '${{ github.workspace }}/build'
@@ -23,6 +25,9 @@ jobs:
       - name: Prepare File Tree
         run: |
           mkdir ./build
+          # Prepare qt cache folder
+          mkdir -p ~/.cache/qt-unified-linux-online
+          chmod 755 ~/.cache/qt-unified-linux-online
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v6
@@ -51,7 +56,7 @@ jobs:
                             xcb-util-renderutil
 
       - name: Setup Qt
-        if: steps.cache-qt.outputs.cache-hit != 'true'
+        # if: steps.cache-qt.outputs.cache-hit != 'true'
         run: |
             # Define target directory and version
             QT_VERSION=6.11.1
