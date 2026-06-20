@@ -9,11 +9,11 @@ jobs:
     container:
       image: "alicevision/alicevision-deps:2026.03.30-rocky9-cuda12.1.1"
     env:
-      DEPS_INSTALL_DIR: /opt/AliceVision_install
       BUILD_TYPE: Release
       CTEST_OUTPUT_ON_FAILURE: 1
       buildDir: '${{ github.workspace }}/build/'
       QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
+      ALICEVISION_DEPS_DIR: /opt/AliceVision_install
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
       QT_DIR: /opt/Qt
     steps:
@@ -26,17 +26,6 @@ jobs:
 
       # 1. Install Qt environment
       - name: Setup Qt
-        # uses: jurplel/install-qt-action@v4
-        # with:
-        #   version: '6.11.1'
-        #   host: ${{ matrix.platform }}
-        #   target: 'desktop'
-        #   setup-python: false
-        #   install-deps: 'nosudo'
-        #   modules: 'qtcharts qtshadertools qttasktree'
-        #   use-official: matrix.os == 'windows-latest'
-        #   email: ${{ secrets.QT_EMAIL }}
-        #   pw: ${{ secrets.QT_PW }}
         run: |
             dnf install -y flex fontconfig freetype glib2-devel libICE
             dnf install -y libX11 libXext libXi libXrender libSM
@@ -97,20 +86,20 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build -S . \
+          cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS:BOOL=ON \
-            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${DEPS_INSTALL_DIR}:${QT_DIR}" \
+            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
             -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
             -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
 
       - name: Build
         run: |
-          cmake --build ./build -j$(nproc) --config Release
+          cmake --build ${{ github.workspace }}/build -j$(nproc) --config Release
 
       - name: Install
         run: |
-          cmake --install build --config Release
+          cmake --install ${{ github.workspace }}/build --config Release
 
       # ── Archive & Upload for nightly release ────────
 
