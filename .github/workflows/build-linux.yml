@@ -29,8 +29,15 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: /opt/Qt/6.11.1
+          key: qt-${{ runner.os }}-6.11.1
+
       # 1. Install Qt environment
-      - name: Setup Qt
+      - name: Setup OS dependencies for Qt
         run: |
             dnf install -y flex fontconfig freetype glib2-devel libICE
             dnf install -y libX11 libXext libXi libXrender libSM
@@ -43,6 +50,9 @@ jobs:
                             xcb-util-keysyms \
                             xcb-util-renderutil
 
+      - name: Setup Qt
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
             # Define target directory and version
             QT_VERSION=6.11.1
             mkdir -p ${QT_DIR}
