@@ -15,7 +15,8 @@ jobs:
       QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
       ALICEVISION_DEPS_DIR: /opt/AliceVision_install
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
-      QT_DIR: /opt/Qt
+      QT_DIR: /opt/Qt/6.11.1/gcc_64
+
     steps:
       - uses: actions/checkout@v1
 
