@@ -90,11 +90,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          echo "== CMakeLists.txt files found:"
-          find . -name "CMakeLists.txt"
-          echo "== Folder tree:"
-          find . -type d
-          cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} \
+          cmake -B ./build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
@@ -103,11 +99,11 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build ${{ github.workspace }}/build -j$(nproc) --config Release
+          cmake --build ./build -j$(nproc) --config Release
 
       - name: Install
         run: |
-          cmake --install ${{ github.workspace }}/build --config Release
+          cmake --install ./build --config Release
 
       # ── Archive & Upload for nightly release ────────
 
