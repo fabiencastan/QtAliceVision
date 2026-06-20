@@ -17,6 +17,8 @@ on:
       - '**.rst'
       - '**.db'
       - 'docs/**'
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build-linux:
