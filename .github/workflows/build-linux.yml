@@ -90,6 +90,7 @@ jobs:
 
       - name: Configure CMake
         run: |
+          find . -name "CMakeLists.txt"
           cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS:BOOL=ON \
