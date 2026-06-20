@@ -11,13 +11,17 @@ jobs:
     env:
       BUILD_TYPE: Release
       CTEST_OUTPUT_ON_FAILURE: 1
-      buildDir: '${{ github.workspace }}/build/'
+      buildDir: '${{ github.workspace }}/build'
       QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
       ALICEVISION_DEPS_DIR: /opt/AliceVision_install
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
       QT_DIR: /opt/Qt
     steps:
       - uses: actions/checkout@v1
+
+      - name: Prepare File Tree
+        run: |
+          mkdir ./build
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v6
