@@ -90,7 +90,10 @@ jobs:
 
       - name: Configure CMake
         run: |
+          echo "== CMakeLists.txt files found:"
           find . -name "CMakeLists.txt"
+          echo "== Folder tree:"
+          find . -type d
           cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS:BOOL=ON \
