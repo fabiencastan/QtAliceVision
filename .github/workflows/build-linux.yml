@@ -9,8 +9,8 @@ jobs:
     container:
       image: "alicevision/qt-av-deps:qt6.11.1-avdeps2026.03.30-rocky9-cuda12.1.1"
     env:
-      LANG: en_US.UTF-8
-      LC_ALL: en_US.UTF-8
+    #   LANG: en_US.UTF-8
+    #   LC_ALL: en_US.UTF-8
       BUILD_TYPE: Release
       CTEST_OUTPUT_ON_FAILURE: 1
       buildDir: '${{ github.workspace }}/build'
