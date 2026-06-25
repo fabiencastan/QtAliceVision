@@ -60,6 +60,13 @@ jobs:
 
       - name: Configure CMake
         run: |
+          echo cmake -B ./build -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DQT_DEBUG_FIND_PACKAGE=ON \
+            -DBUILD_SHARED_LIBS:BOOL=ON \
+            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
+            -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
+            -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
           cmake -B ./build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DQT_DEBUG_FIND_PACKAGE=ON \
