@@ -43,8 +43,13 @@ jobs:
           
           # Fetch the public release JSON for the 'nightly' tag and extract the download URL matching *linux.tar.gz
           ASSET_URL=$(curl -s https://api.github.com/repos/alicevision/AliceVision/releases/tags/nightly \
-            | jq -r '.assets[] | select(.name | ascii_downcase | endswith("linux.tar.gz")) | .browser_download_url')
-          
+          python3 -c """
+            import sys, json
+            assets = json.load(sys.stdin)['assets']
+            url = next(a['browser_download_url'] for a in assets if a['name'].lower().endswith('linux.tar.gz'))
+            print(url)
+            """)
+
           echo "Downloading Linux Nightly from: $ASSET_URL"
           curl -L -O "$ASSET_URL"
           
