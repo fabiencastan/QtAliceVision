@@ -7,18 +7,15 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     container:
-      image: "alicevision/alicevision-deps:2026.03.30-rocky9-cuda12.1.1"
+      image: "alicevision/qt-av-deps:qt6.11.1-avdeps2026.03.30-rocky9-cuda12.1.1"
     env:
       LANG: en_US.UTF-8
       LC_ALL: en_US.UTF-8
       BUILD_TYPE: Release
       CTEST_OUTPUT_ON_FAILURE: 1
       buildDir: '${{ github.workspace }}/build'
-      QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
-      ALICEVISION_DEPS_DIR: /opt/AliceVision_install
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
-      QT_VERSION: 6.11.1
-      QT_DIR: /opt/Qt/${QT_VERSION}/gcc_64
+      QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
 
     steps:
       - uses: actions/checkout@v1
@@ -26,55 +23,6 @@ jobs:
       - name: Prepare File Tree
         run: |
           mkdir ./build
-          # Prepare qt cache folder
-          mkdir -p ~/.cache/qt-unified-linux-online
-          chmod 755 ~/.cache/qt-unified-linux-online
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.11'
-
-      # - name: Cache Qt
-      #   id: cache-qt
-      #   uses: actions/cache@v5
-      #   with:
-      #     path: /opt/Qt
-      #     key: qt-${{ runner.os }}-6.11.1
-
-      # 1. Install Qt environment
-      - name: Setup OS dependencies for Qt
-        run: |
-            dnf install -y flex fontconfig freetype glib2-devel libICE
-            dnf install -y libX11 libXext libXi libXrender libSM
-            dnf install -y libXt-devel mesa-libGLU-devel mesa-libGL-devel mesa-libEGL-devel
-            dnf install -y zlib-devel systemd openssh-server
-            dnf install -y libxcb-devel \
-                            libxkbcommon-devel \
-                            libxkbcommon-x11-devel \
-                            xcb-util-wm xcb-util-image \
-                            xcb-util-keysyms \
-                            xcb-util-renderutil
-
-      - name: Setup Qt
-        # if: steps.cache-qt.outputs.cache-hit != 'true'
-        run: |
-            # Define target directory and version
-            QT_COMPONENT_VERSION=${QT_VERSION//./}   # strip dots for component version
-            # mkdir -p ${QT_DIR}
-
-            wget --no-check-certificate "https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run" -O "qt.run"
-            ls -lh
-            echo "qt.run downloaded"
-            chmod +x qt.run
-            echo "launch qt.run:"
-            ./qt.run --root /opt/Qt --verbose --email ${{ secrets.QT_EMAIL }} --password ${{ secrets.QT_PW }} --accept-obligations \
-                --accept-licenses --default-answer --platform minimal --auto-answer installationErrorWithCancel=Ignore \
-                --no-force-installations --no-default-installations --confirm-command \
-                --auto-answer OverwriteTargetDirectory=Yes \
-                install qt.qt6.${QT_COMPONENT_VERSION}.linux_gcc_64 qt.qt6.${QT_COMPONENT_VERSION}.addons.qtcharts qt.qt6.${QT_COMPONENT_VERSION}.addons.qt3d
-            echo "qt.run done"
-            rm qt.run
 
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
