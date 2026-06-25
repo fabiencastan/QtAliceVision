@@ -37,7 +37,6 @@ jobs:
 
       # 2. Download nightly AliceVision binaries via GitHub CLI
       - name: Fetch AliceVision Nightly Binaries (Linux)
-        if: matrix.os == 'ubuntu-latest'
         run: |
           mkdir -p ${ALICEVISION_BUNDLE}
           cd ${ALICEVISION_BUNDLE}
