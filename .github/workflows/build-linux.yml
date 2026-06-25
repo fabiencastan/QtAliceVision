@@ -67,6 +67,16 @@ jobs:
             -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
             -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
             -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
+
+          echo "ALICEVISION_BUNDLE=${ALICEVISION_BUNDLE}"
+          echo "ALICEVISION_DEPS_DIR${ALICEVISION_DEPS_DIR}"
+          echo "QT_DIR=${QT_DIR}"
+          echo "QTALICEVISION_ROOT=${QTALICEVISION_ROOT}"
+          ls -l ${ALICEVISION_BUNDLE} || true
+          ls -l ${ALICEVISION_DEPS_DIR} || true
+          ls -l ${QT_DIR} || true
+          ls -l ${QTALICEVISION_ROOT} || true
+
           cmake -B ./build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DQT_DEBUG_FIND_PACKAGE=ON \
