@@ -16,6 +16,8 @@ jobs:
       buildDir: '${{ github.workspace }}/build'
       ALICEVISION_BUNDLE: ${{ github.workspace }}/../AV_bundle
       QTALICEVISION_ROOT: ${{ github.workspace }}/../QTAV_install
+      ALICEVISION_DEPS_DIR: /opt/AliceVision_install
+      QT_DIR: /opt/Qt/6.11.1
 
     steps:
       - uses: actions/checkout@v1
@@ -56,7 +58,7 @@ jobs:
           # Extract the archive (handles dynamic names by expanding the wildcard)
           tar -xzf *.tar.gz --strip-components=1
 
-          rm *.tar.gz
+          rm -f *.tar.gz
 
       - name: Configure CMake
         run: |
@@ -64,9 +66,9 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DQT_DEBUG_FIND_PACKAGE=ON \
             -DBUILD_SHARED_LIBS:BOOL=ON \
-            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
+            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
             -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
-            -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
+            -DAliceVision_DIR="${ALICEVISION_BUNDLE}/share/aliceVision/cmake"
 
           echo "ALICEVISION_BUNDLE=${ALICEVISION_BUNDLE}"
           echo "ALICEVISION_DEPS_DIR${ALICEVISION_DEPS_DIR}"
@@ -81,9 +83,9 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DQT_DEBUG_FIND_PACKAGE=ON \
             -DBUILD_SHARED_LIBS:BOOL=ON \
-            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_BUNDLE}:${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
+            -DCMAKE_PREFIX_PATH:PATH="${ALICEVISION_DEPS_DIR}:${QT_DIR}" \
             -DCMAKE_INSTALL_PREFIX:PATH="${QTALICEVISION_ROOT}" \
-            -DAliceVision_DIR="${ALICEVISION_BUNDLE}"
+            -DAliceVision_DIR="${ALICEVISION_BUNDLE}/share/aliceVision/cmake"
 
       - name: Build
         run: |
