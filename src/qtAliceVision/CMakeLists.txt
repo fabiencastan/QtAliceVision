@@ -58,6 +58,8 @@ find_package(Qt6 COMPONENTS Quick REQUIRED)
 find_package(Qt6 COMPONENTS Qml REQUIRED)
 find_package(Qt6 COMPONENTS Charts REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Gui)
+# Since Qt 6.10, private modules must be requested explicitly
+find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)
 find_package(Qt6 COMPONENTS ShaderTools)
 
 
